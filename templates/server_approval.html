@@ -1,0 +1,264 @@
+{% extends "server_layout.html" %}
+
+{% block title %}
+    Document Requests | Admin Panel
+{% endblock %}
+
+{% block main %}
+    <section class="text-dark py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-12">
+                    <div class="card mt-5">
+                        <div class="card-body">
+                            <h2 class="card-title text-center mb-4">Document Requests</h2>
+                            <!-- First Table -->
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Age</th>
+                                            <th scope="col">Sex</th>
+                                            <th scope="col">Address</th>
+                                            <th scope="col">Purpose</th>
+                                            <th scope="col">Date Requested</th>
+                                            <th scope="col">Estimated Date</th>
+                                            <th scope="col">Type of Document</th>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="documentTable1">
+                                        <!-- Jinja for loop iterating over queried request history-->
+                                        {% for request in requests %}
+                                            {% if request['verdict'] == "For Approval" %}
+                                                <tr>
+                                                    <td>{{ request["name"] }}</td>
+                                                    <td>{{ request["age"] }}</td>
+                                                    <td>{{ request["sex"] }}</td>
+                                                    <td>{{ request["address"] }}</td>
+                                                    <td>{{ request["purpose"] }}</td>
+                                                    <td>{{ request["dateRequested"] }}</td>
+                                                    <td>
+                                                        <form method="post" action="/server_approval">
+                                                            <input type="hidden" name="request_id" value="{{ request['id'] }}">
+                                                            <input type="date" id="date" name="date" class="form-control" required>
+                                                        </td>
+                                                        <td>{{ request["file"] }}</td>
+                                                        <td><a href="{{ request['validId'] }}" target="_blank">View Image</a></td>
+                                                        <td>
+                                                            <button type="submit" name="action" value="accept" class="btn btn-success btn-sm">Accept</button>
+                                                            <button type="submit" name="action" value="deny" class="btn btn-danger btn-sm">Deny</button>
+                                                        </td>
+                                                    </form>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+
+                                </table>
+                            </div>
+                            <!-- Pagination for First Table -->
+                            <nav>
+                                <ul class="pagination justify-content-end" id="pagination1">
+                                    <!-- Previous button -->
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" id="prev1">Previous</a>
+                                    </li>
+
+                                    <!-- Pagination numbers -->
+
+                                    <!-- Next button -->
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" id="next1">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title text-center mb-4">Pending Document</h2>
+                            <!-- Second Table -->
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Age</th>
+                                            <th scope="col">Sex</th>
+                                            <th scope="col">Address</th>
+                                            <th scope="col">Purpose</th>
+                                            <th scope="col">Date Requested</th>
+                                            <th scope="col">Estiamted Date</th>
+                                            <th scope="col">Type of Document</th>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="documentTable2">
+                                        <!-- Jinja for loop iterating over queried accepted request-->
+                                        {% for request in requests %}
+                                            {% if request['verdict'] == "pending" %}
+                                                <tr>
+                                                    <td>{{ request["name"] }}</td>
+                                                    <td>{{ request["age"] }}</td>
+                                                    <td>{{ request["sex"] }}</td>
+                                                    <td>{{ request["address"] }}</td>
+                                                    <td>{{ request["purpose"] }}</td>
+                                                    <td>{{ request["dateRequested"] }}</td>
+                                                    <td>{{ request["date"] }}</td>
+                                                    <td>{{ request["file"] }}</td>
+                                                    <td><a href="{{ request['validId'] }}" target="_blank">View Image</a></td>
+                                                    <td>
+                                                        <form method="post" action="/server_approval">
+                                                            <input type="hidden" name="request_id" value="{{ request['id'] }}">
+                                                            <button type="submit" name="action" value="completed" class="btn btn-success btn-sm">Completed</button>
+                                                            <button type="submit" name="action" value="cancel" class="btn btn-danger btn-sm">Cancel</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Pagination for Second Table -->
+                            <nav>
+                                <ul class="pagination justify-content-end" id="pagination2">
+                                    <!-- Previous button -->
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" id="prev2">Previous</a>
+                                    </li>
+
+                                    <!-- Pagination numbers -->
+
+                                    <!-- Next button -->
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" id="next2">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pagination styles-->
+    <style>
+        /* Active page */
+        .pagination .page-item.active .page-link {
+            background-color: blue;
+            border-color: blue;
+            color: white;
+        }
+
+        /* Styles for pagination previous and next button */
+        .pagination .page-item.active .page-link.next,
+        .pagination .page-item.active .page-link.previous {
+            background-color: transparent;
+            border-color: transparent;
+            color: blue;
+        }
+
+        /* Styles for font color */
+        .pagination .page-item .page-link {
+            color: #1E3392;
+        }
+
+    </style>
+
+<script>
+
+    // Waits for the HTML to be fully loaded
+    document.addEventListener("DOMContentLoaded", function()
+    {
+        const rowsPerPage = 5; // Number of rows per page
+        // Targets the table ID of a specific table
+        const table1Body = document.getElementById("documentTable1");
+        const table2Body = document.getElementById("documentTable2");
+        const pagination1 = document.getElementById("pagination1");
+        const pagination2 = document.getElementById("pagination2");
+
+        // Set up pagination for the table
+        function paginateTable(tableBody, paginationElement, prevButtonId, nextButtonId)
+        {
+            const rows = Array.from(tableBody.getElementsByTagName("tr"));
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
+            let currentPage = 1; // Initialize current page
+
+            // Render table
+            function renderTable(page)
+            {
+                tableBody.innerHTML = "";
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                const pageRows = rows.slice(start, end);
+                pageRows.forEach(row => tableBody.appendChild(row));
+            }
+
+            function renderPagination()
+            {
+                let paginationHTML = "";
+
+                // Previous button
+                paginationHTML += `
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage - 1}" id="${prevButtonId}">Previous</a>
+                    </li>
+                `;
+
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++)
+                {
+                    paginationHTML += `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" data-page="${i}">${i}</a>
+                        </li>
+                    `;
+                }
+
+                // Next button
+                paginationHTML += `
+                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage + 1}" id="${nextButtonId}">Next</a>
+                    </li>
+                `;
+
+                paginationElement.innerHTML = paginationHTML;
+
+                // Event listeners for pagination links
+                paginationElement.querySelectorAll('.page-link').forEach(link =>
+                {
+                    link.addEventListener('click', (e) =>
+                    {
+                        e.preventDefault();
+                        let page = parseInt(e.target.getAttribute('data-page'));
+                        if (isNaN(page)) return;
+
+                        // Ensure page boundaries
+                        if (page < 1) page = 1;
+                        if (page > totalPages) page = totalPages;
+
+                        currentPage = page;
+                        renderTable(currentPage);
+                        renderPagination(); // Re-render pagination after updating currentPage
+                    });
+                });
+            }
+
+            renderPagination();
+            renderTable(currentPage); // Initial render
+        }
+
+        paginateTable(table1Body, pagination1, "prev1", "next1");
+        paginateTable(table2Body, pagination2, "prev2", "next2");
+    });
+</script>
+
+{% endblock %}

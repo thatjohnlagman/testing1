@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    | Request File
+{% endblock %}
+
+{% block main %}
+<section class="text-white py-5">
+    <div class="container d-flex justify-content-center align-items-center pb-5">
+        <div class="row justify-content-center w-100">
+            <div class="col-lg-8">
+                <div class="card mt-5" style="border: 1px solid gray;">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">Request a File</h2>
+                        <!-- Form for requesting details of the client -->
+                        <form action="/" method="post" enctype="multipart/form-data">
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="name" class="form-label">Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" placeholder="Name" autocomplete="off" required>
+                                </div>
+                                <div class="col">
+                                    <label for="age" class="form-label">Age</label>
+                                    <input type="number" class="form-control" id="age" name="age" placeholder="Age" autocomplete="off" required>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="sex" class="form-label">Sex</label>
+                                    <select class="form-select" id="sex" name="sex" required>
+                                        <option value="" selected disabled>Select your sex</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <label for="address" class="form-label">Address</label>
+                                    <textarea class="form-control" id="address" rows="1" name="address" placeholder="Address" autocomplete="off" required></textarea>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="purpose" class="form-label">Purpose</label>
+                                    <input type="text" class="form-control" id="purpose" name="purpose" placeholder="Purpose" autocomplete="off" required>
+                                </div>
+                                <div class="col">
+                                    <label for="fileType" class="form-label">Type of File to Request</label>
+                                    <select class="form-select" id="fileType" name="file" required>
+                                        <option value="" selected disabled>Select file type</option>
+                                        <!-- Jinja for loop iterating over a defined list in app.py -->
+                                        {% for document in documents %}
+                                        <option value="{{ document }}">{{ document }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="validID" class="form-label">Please upload a valid ID</label>
+                                <input type="file" class="form-control" id="validID" name="validId" accept=".jpg, .jpeg, .pdf, .png"  required>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg">Submit Request</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

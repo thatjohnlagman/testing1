@@ -1,0 +1,182 @@
+{% extends "server_layout.html" %}
+
+{% block title %}
+    Request History | Barangay CS50
+{% endblock %}
+
+{% block main %}
+<section class="text-dark py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card mt-5">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">Request History</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                        <!-- Table Header -->
+                                    <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Address</th>
+                                        <th scope="col">Document Type</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Date Requested</th>
+                                        <th scope="col">Date Completed</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="requestHistoryTableBody">
+                                     <!-- Jinja for loop for iterating over the queried request history-->
+                                    {% for request in requests %}
+                                    <tr>
+
+                                        <td>
+                                            {{ request["name"] }}
+                                        </td>
+
+                                        <td>
+                                            {{ request["address"] }}
+                                        </td>
+
+                                        <td>
+                                            {{ request["file"] }}
+                                        </td>
+                                        <!-- Jinja if conditional for checking verdict status -->
+                                        {% if request["verdict"] == "completed" %}
+                                        <td>
+                                            <span class="badge bg-success">Completed</span>
+                                        </td>
+                                        {% elif request["verdict"] == "denied" %}
+                                        <td>
+                                            <span class="badge bg-danger">Denied</span>
+                                        </td>
+                                        {% elif request["verdict"] == "cancelled" %}
+                                        <td>
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        </td>
+                                        {% endif %}
+
+                                        <td>
+                                            <span>{{ request["dateRequested"]}}</span>
+                                        </td>
+
+
+                                            {% if request["verdict"] == "completed" %}
+                                            <td>
+                                                <span>{{ request["date"] }}</span>
+                                            </td>
+                                            {% elif request["verdict"] == "denied" %}
+                                            <td>
+                                                <span>Denied</span>
+                                            </td>
+                                            {% elif request["verdict"] == "cancelled" %}
+                                            <td>
+                                                <span>Cancelled</span>
+                                            </td>
+                                            {% endif %}
+
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <nav>
+                            <ul class="pagination justify-content-end" id="paginationControls">
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Waits for the HTML to be fully loaded
+    document.addEventListener("DOMContentLoaded", function()
+    {
+        const rowsPerPage = 5; // Number of rows per page
+
+         // Targets the table ID of a specific table
+        const tableBody = document.getElementById("requestHistoryTableBody");
+        const paginationControls = document.getElementById("paginationControls");
+
+        const rows = Array.from(tableBody.getElementsByTagName("tr"));
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+        // Renders the data to the table
+        function renderTable(page)
+        {
+            tableBody.innerHTML = "";
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const pageRows = rows.slice(start, end);
+            pageRows.forEach(row => tableBody.appendChild(row));
+        }
+
+        // Function to implement pagination
+        function renderPagination()
+        {
+            let paginationHTML = `
+                <li class="page-item"><a class="page-link" href="#" data-page="prev">Previous</a></li>
+            `;
+
+            for (let i = 1; i <= totalPages; i++)
+            {
+                paginationHTML += `
+                    <li class="page-item"><a class="page-link" href="#" data-page="${i}">${i}</a></li>
+                `;
+            }
+
+            paginationHTML += `
+                <li class="page-item"><a class="page-link" href="#" data-page="next">Next</a></li>
+            `;
+
+            paginationControls.innerHTML = paginationHTML;
+
+            paginationControls.querySelectorAll('.page-link').forEach(link =>
+            {
+                link.addEventListener('click', (e) =>
+                {
+                    e.preventDefault();
+                    let page = e.target.getAttribute('data-page');
+                    if (page === 'prev')
+                    {
+                        page = Math.max(1, currentPage - 1);
+                    } else if (page === 'next')
+                    {
+                        page = Math.min(totalPages, currentPage + 1);
+                    } else
+                    {
+                        page = parseInt(page);
+                    }
+                    currentPage = page;
+                    renderTable(currentPage);
+                    updatePagination();
+                });
+            });
+        }
+        // Dynamically updates pagination based on number of data, if exceeded by 5, adds another page
+        function updatePagination()
+        {
+            paginationControls.querySelectorAll('.page-item').forEach((item, index) =>
+            {
+                if (index === currentPage)
+                {
+                    item.classList.add('active');
+                }
+                else
+                {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        let currentPage = 1;
+        renderTable(currentPage);
+        renderPagination();
+        updatePagination();
+    });
+</script>
+
+{% endblock %}
